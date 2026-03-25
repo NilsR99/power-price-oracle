@@ -1,0 +1,16 @@
+# Basis-Bibliotheken für API-Abfragen und Datenverarbeitung
+requests==2.31.0
+pandas==2.2.3
+numpy==2.1.0
+
+# Spezielle Bibliotheken für Open-Meteo (Wetter-Daten)
+openmeteo-requests==1.3.0
+requests-cache==1.2.0
+retry-requests==2.0.0
+
+# Hilfsmittel für Zeitzonen (Wichtig für Berlin-Zeit)
+pytz==2024.1
+
+# Dashboard & Interaktive Visualisierung
+streamlit==1.55.0
+plotly==6.6

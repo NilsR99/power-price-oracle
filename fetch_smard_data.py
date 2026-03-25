@@ -1,43 +1,29 @@
 import requests
-from requests.adapters import HTTPAdapter
-from urllib3.util.retry import Retry
+import logging
 import pandas as pd
 import os
-import logging
+from api_client import create_retry_session # Bindestrich korrigiert!
 
 # Setup logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
-def get_session():
-    """Returns a requests.Session with retry logic configured."""
-    session = requests.Session()
-    retry = Retry(
-        total=5, # Obergrenze
-        read=5, # Leseversuch der Daten
-        connect=5, # Verbindungsaufbauversuche
-        backoff_factor=1, # expotentiell wachsende Wartezeit 1 * 2^0, 1 * 2^1
-        status_forcelist=[429, 500, 502, 503, 504], # HTTP Statuscodes 429: Too Many Requests (Limit der SMARD API). die anderen sind Serverfehler
-        # 404 ist bewusst nicht drin, da eine falsche URL nicht nochmal versucht werden muss.
-    )
-    adapter = HTTPAdapter(max_retries=retry) # addaptiert die retry Regeln, damit die Session bei einem Fehler nicht abstürzt
-    session.mount('http://', adapter) # immer wenn die URL mit http startet, nutze den Adapter
-    session.mount('https://', adapter)  # immer wenn die URL mit https startet, nutze den Adapter
-    return session
-
-def fetch_smard_data(filter_id, start_idx=-4, end_idx=-1):
+def fetch_smard_data(filter_id, metric_name, start_date, end_date):
     """
-    Fetches Day-Ahead Prices (DE/LU) from SMARD API.
-    Market area: DE/LU
-    Filter ID: 4169
-    Region: DE
-    Resolution: hour
-
+    Fetches Data from SMARD API and exports it as an ISO-formatted JSON.
     """
-    session = get_session()
-
+    session = create_retry_session()
     base_url = "https://www.smard.de/app/chart_data"
     region = "DE"
     resolution = "hour"
+
+    # 1. Ziel-Zeitraum in UTC datetime umwandeln
+    start_dt = pd.to_datetime(start_date, utc=True)
+    # Setze end_dt auf die letzte Sekunde des Jahres (31.12.2025 23:59:59)
+    end_dt = pd.to_datetime(end_date, utc=True) + pd.Timedelta(days=1) - pd.Timedelta(seconds=1)
+
+    # In Millisekunden für den Abgleich mit dem API-Index
+    start_ms = int(start_dt.timestamp() * 1000)
+    end_ms = int(end_dt.timestamp() * 1000)
 
     # 1. Fetch available timestamps
     index_url = f"{base_url}/{filter_id}/{region}/index_{resolution}.json"
@@ -55,14 +41,20 @@ def fetch_smard_data(filter_id, start_idx=-4, end_idx=-1):
         logging.error(f"Error fetching index: {e}")
         return None
 
-    # We need data for the last 7 days and upcoming 24 hours.
-    # The timestamps array contains milliseconds timestamps. Each represents a week or chunk of data.
-    # We will fetch the last two chunks to ensure we cover the requested time window.
+    # Chunks filtern (Die Logik-Korrektur)
+    # Ein Chunk ist ca. 1 Woche lang (7 Tage * 24h * 60m * 60s * 1000ms = 604.800.000 ms)
+    # Wir nehmen alle Chunks, die enden, nachdem unser Zeitraum beginnt, 
+    # UND die beginnen, bevor unser Zeitraum endet.
+    chunk_duration_ms = 7 * 24 * 60 * 60 * 1000
+    target_timestamps = [
+        ts for ts in timestamps 
+        if (ts + chunk_duration_ms) >= start_ms and ts <= end_ms
+    ]
 
-    recent_timestamps = timestamps[start_idx:end_idx]
+    logging.info(f"Lade {len(target_timestamps)} Wochen-Pakete für das Jahr {start_date[:4]}...")
     all_series = []
 
-    for ts in recent_timestamps:
+    for ts in target_timestamps:
         data_url = f"{base_url}/{filter_id}/{region}/{filter_id}_{region}_{resolution}_{ts}.json"
         logging.info(f"Fetching data from {data_url}")
         try:
@@ -79,4 +71,33 @@ def fetch_smard_data(filter_id, start_idx=-4, end_idx=-1):
         logging.error("No data fetched from the API.")
         return None
 
-    return all_series
+    # --- Transformation in das Ziel-Format ---
+    
+    # Rohe Liste in einen Pandas DataFrame wandeln
+    df = pd.DataFrame(all_series, columns=["timestamp_ms", metric_name])
+    
+    # Millisekunden in korrektes UTC-Datum konvertieren
+    df["date"] = pd.to_datetime(df["timestamp_ms"], unit="ms", utc=True)
+    
+    # Duplikate entfernen (Chunks bei SMARD überschneiden sich oft am Rand)
+    df = df.drop_duplicates(subset=["date"]).sort_values("date")
+
+    # Daten ausßerhalb des Zeitraums abschneiden!
+    mask = (df["date"] >= start_dt) & (df["date"] <= end_dt)
+    df = df.loc[mask].reset_index(drop=True)
+    
+    # Nicht mehr benötigte Millisekunden-Spalte löschen
+    df = df.drop(columns=["timestamp_ms"])
+    
+    # Spalten in die richtige Reihenfolge bringen
+    df = df[["date", metric_name]]
+    
+    # --- 3. Export als JSON ---
+    os.makedirs("data/smard", exist_ok=True)
+    json_path = f"data/smard/smard_{metric_name}_{filter_id}.json"
+    
+    # orient="records" und date_format="iso" erzeugt exakt das gewünschte Format
+    df.to_json(json_path, orient="records", date_format="iso", indent=4)
+    logging.info(f"Erfolgreich gespeichert: {json_path}")
+    
+    return json_path
