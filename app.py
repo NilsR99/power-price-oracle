@@ -2,8 +2,11 @@ import streamlit as st
 import pandas as pd
 import os
 import glob
+import datetime
 
-# Importiere unsere ausgelagerten Diagramm-Funktionen
+from merge_script import run_merge_pipeline
+
+# Importiere ausgelagerte Diagramm-Funktionen
 import diagramme.korrelationsmatrix as km
 import diagramme.hypothese_1 as h1
 import diagramme.hypothese_2 as h2
@@ -36,10 +39,50 @@ def load_data(file_path):
     df['date'] = pd.to_datetime(df['date'])
     return df
 
+# --- UI: Die ETL-Steuerzentrale (Startseite / Sidebar) ---
+st.sidebar.title("Daten-Manager")
+st.sidebar.markdown("Generiere einen neuen Datensatz")
+
+# Datums-Eingabefelder mit der harten 2020-2025 Grenze aus deiner Pipeline
+col1, col2 = st.sidebar.columns(2)
+with col1:
+    ui_start_date = st.date_input(
+        "Startdatum", 
+        min_value=datetime.date(2020, 1, 1), 
+        max_value=datetime.date(2025, 12, 31), 
+        value=datetime.date(2025, 1, 1)
+    )
+with col2:
+    ui_end_date = st.date_input(
+        "Enddatum", 
+        min_value=datetime.date(2020, 1, 1), 
+        max_value=datetime.date(2025, 12, 31), 
+        value=datetime.date(2025, 12, 31)
+    )
+
+# Der entkoppelte Action-Button
+if st.sidebar.button("Daten live abrufen", use_container_width=True):
+    # Sobald geklickt wird, zeigen wir einen Lade-Indikator
+    with st.spinner(f"Lade API-Daten von {ui_start_date} bis {ui_end_date}..."):
+        try:
+            # Aufruf Pipeline!
+            new_file_path = run_merge_pipeline(
+                start_date=ui_start_date.strftime("%Y-%m-%d"), 
+                end_date=ui_end_date.strftime("%Y-%m-%d")
+            )
+            if new_file_path:
+             st.sidebar.success("Daten erfolgreich generiert!")
+             st.cache_data.clear() # NEU: Zwingt Streamlit, die alte Datei zu vergessen
+             st.rerun()
+        except Exception as e:
+            st.sidebar.error(f"Fehler beim Abruf: {e}")
+
+st.sidebar.markdown("---")
+
 FILE_PATH = get_latest_data_file()
 
 if FILE_PATH is None:
-    st.error("⚠️ Keine Datengrundlage gefunden!")
+    st.error("Keine Datengrundlage gefunden!")
     st.info("Bitte führe zuerst das ETL-Skript (z.B. `merge_pipeline.py`) aus, um die Wetter- und Strommarktdaten herunterzuladen. Das Dashboard erwartet die Daten im Ordner `data/merged/`.")
     st.stop() # Bricht die Ausführung hier sauber ab, ohne hässliche Fehlermeldungen zu werfen
 
@@ -58,7 +101,7 @@ end_date = df_master['date'].max().strftime('%d.%m.%Y')
 anzahl_stunden = len(df_master)
 
 # Anzeige direkt unter dem Haupttitel auf der Startseite
-st.markdown(f"**🗓️ Analysierter Zeitraum:** `{start_date}` bis `{end_date}` | **📊 Datenpunkte:** `{anzahl_stunden} Stunden`")
+st.markdown(f"**🗓️ Analysierter Zeitraum:** `{ui_start_date}` bis `{ui_end_date}` | **📊 Datenpunkte:** `{anzahl_stunden} Stunden`")
 st.markdown("---") # Optische Trennlinie, bevor die eigentlichen Diagramme beginnen
 
 # --- Navigation (Das "Burger-Menü" in der Sidebar) ---
