@@ -25,3 +25,57 @@ Um das Rauschen der 8760 Jahresstunden zu minimieren, werden die Daten auf ganze
 ### 4. Tageslastprofil / SLP (Line-Chart)
 Zeitreihenanalyse des deutschen Stromverbrauchs im Tagesverlauf. 
 * **Besonderheit:** Die UTC-Rohdaten der API werden on-the-fly in die deutsche Lokalzeit (`Europe/Berlin`) konvertiert, um menschliche Verhaltensmuster korrekt abzubilden. Zudem trennt die Analyse strikt zwischen Werktagen (Industrielast) und Wochenenden.
+
+## Installation und lokales Setup
+
+Dieses Projekt erfordert eine strikte Reihenfolge bei der Ausführung: Zuerst muss die Datengrundlage über die APIs generiert werden (ETL-Pipeline), erst danach kann die Visualisierung gestartet werden. Befolge diese Schritte exakt, um das Dashboard lokal auszuführen.
+
+### Voraussetzungen
+* **Python:** Version 3.9 oder neuer muss auf dem System installiert sein.
+* **Git:** Zum Herunterladen des Quellcodes.
+
+### 1. Repository klonen
+Lade den Code auf deinen lokalen Rechner herunter und wechsle in das Projektverzeichnis:
+```bash
+git clone https://github.com/NilsR99/power-price-oracle.git
+cd power-price-oracle
+```
+
+### 2. Virtuelle Umgebung einrichten (Best Practice)
+
+Installiere die Projektabhängigkeiten niemals global auf deinem Betriebssystem. Nutze eine isolierte Umgebung (venv), um Versionskonflikte mit anderen Python-Projekten zu vermeiden:
+```bash
+# Virtuelle Umgebung erstellen
+python -m venv .venv
+
+# Umgebung aktivieren (Windows Command Prompt / PowerShell)
+.venv\Scripts\activate
+
+# Umgebung aktivieren (macOS / Linux)
+source .venv/bin/activate
+```
+
+### 3. Abhängigkeiten installieren
+
+Sobald die virtuelle Umgebung aktiv ist (sichtbar am (.venv) Präfix in deinem Terminal), installiere die exakten Versionen der benötigten Bibliotheken:
+```bash
+pip install -r requirements.txt
+```
+
+### Datengrundlage generieren (WICHTIG!)
+
+Das Dashboard enthält keine vorkompilierten Daten. Du musst zwingend vor dem ersten Start die Daten-Pipeline ausführen, um die aktuellen API-Daten (SMARD Strommarkt & Open-Meteo Wetter) live abzurufen und zu mergen.
+```bash
+python merge_pipeline.py
+```
+
+Hinweis: Dieses Skript benötigt je nach Internetverbindung einige Sekunden. Es erstellt automatisch den Pfad data/merged/ und legt dort die resultierende Master-JSON ab. Das Dashboard findet die aktuellste Datei bei jedem Start automatisch (Auto-Discovery).
+
+5. Dashboard starten
+
+Starte nun den lokalen Streamlit-Server, um die grafische Oberfläche zu laden:
+```bash
+streamlit run app.py
+```
+
+Das Analyse-Dashboard öffnet sich anschließend automatisch in deinem Standard-Webbrowser unter der lokalen Adresse http://localhost:8501.
