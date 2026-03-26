@@ -30,11 +30,13 @@ jobs:
         # ACHTUNG: Hier crasht die Pipeline, wenn die requirements.txt fehlt!
         if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
 
-    - name: 🔍 Code-Qualität prüfen (Linting mit Flake8)
+    - name: Code-Qualität prüfen (Linting mit Flake8)
       run: |
         # Stoppt den Build bei harten Syntaxfehlern oder undefinierten Variablen
         flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
         
-    # HIER WÜRDEN SPÄTER DEINE TESTS STEHEN (z.B. pytest)
-    # - name: 🧪 Unit Tests ausführen
-    #   run: pytest tests/
+    
+    - name: Unit Tests & Coverage ausführen
+      run: |
+        # Dieser Befehl führt die Tests aus und druckt die Coverage-Tabelle in die GitHub-Logs
+        pytest tests/ -v --cov=merge_script --cov-report=term-missing
