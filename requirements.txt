@@ -14,3 +14,6 @@ pytz==2024.1
 # Dashboard & Interaktive Visualisierung
 streamlit==1.55.0
 plotly==6.6
+# ENTSO-E API & Environment variables
+entsoe-py
+python-dotenv
