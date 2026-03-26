@@ -2,7 +2,7 @@ import requests
 import logging
 import pandas as pd
 import os
-from api_client import create_retry_session # Bindestrich korrigiert!
+from api_response_scripts.api_client import create_retry_session 
 
 # Setup logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')

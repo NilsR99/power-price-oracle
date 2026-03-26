@@ -3,16 +3,17 @@ from datetime import datetime
 import os
 import logging
 
-from fetch_weather_data import fetch_weather_data
-from fetch_smard_data import fetch_smard_data
+from api_response_scripts.fetch_weather_data import fetch_weather_data
+from api_response_scripts.fetch_smard_data import fetch_smard_data
 
 # Setup logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
 # --- ZENTRALE KONFIGURATION ---
-JAHR = "2025"
-START_DATE = f"{JAHR}-01-01"
-END_DATE = f"{JAHR}-12-31"
+ANFANGSJAHR = "2022"
+ENDJAHR = "2025"
+START_DATE = f"{ANFANGSJAHR}-01-01"
+END_DATE = f"{ENDJAHR}-12-31"
 # Liste der SMARD-IDs (Filter-ID, Gewünschter_Spaltenname)
 SMARD_CONFIG = [
     ("4169", "price_day_ahead"),      # Target: Der Börsenpreis

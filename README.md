@@ -1,18 +1,27 @@
-# SMARD Electricity Market Data
+# BIA Power Oracle: Strommarkt & Wetter Analyse
 
-## Market Data Insights
+Dieses Projekt ist eine Business-Intelligence- und Data-Science-Pipeline zur Analyse des deutschen Strommarktes (Day-Ahead-Preise). Es verknüpft meteorologische physikalische Treiber (Open-Meteo API) mit marktökonomischen Ist-Werten (SMARD API) in einem denormalisierten Datenmodell, um preissetzende Mechanismen (wie den Merit-Order-Effekt) visuell und statistisch zu beweisen.
 
-### What are "Day-Ahead Prices"?
-The Day-Ahead price represents the auction-based clearing price for electricity delivery on the following day. Participants in the wholesale electricity market bid and offer electricity for each hour (or 15-minute intervals) of the next day. The intersection of the aggregated supply and demand curves determines the clearing price.
+Das Frontend besteht aus einem interaktiven, modularen **Streamlit-Dashboard**, das die komplexen, nicht-linearen Zusammenhänge des Energiemarktes explorierbar macht.
 
-### Significance for Industrial Procurement
-For industrial consumers, the Day-Ahead price is a critical benchmark. Procuring electricity strategically involves analyzing the spread between peak (times of high demand, e.g., morning and evening) and off-peak (times of low demand, e.g., night and weekend) prices. Industries can reduce costs by shifting energy-intensive processes to off-peak hours when prices are lower or even negative due to high renewable energy feed-in.
+## Analytische Features & Diagramme
 
-### Current Market Trend
-Based on the retrieved data for the last 7 days and upcoming 24 hours:
-- **Average Price**: €110.24/MWh
-- **Minimum Price**: €-11.76/MWh
-- **Maximum Price**: €263.01/MWh
-- **Standard Deviation**: €56.02/MWh
+Das Dashboard ist in vier logische Analyse-Module unterteilt, die über die linke Seitenleiste (Sidebar) navigiert werden können:
 
-**Interpretation**: The current market exhibits a **relatively high** price level with **high volatility**. The spread between the minimum and maximum price is €274.77/MWh, which highlights the potential savings from load shifting and flexible industrial production.
+### 1. Dynamische Korrelations-Matrix (Pearson)
+Eine Heatmap zur explorativen Datenanalyse (EDA). Sie berechnet lineare Zusammenhänge zwischen selbst wählbaren Variablen (z. B. Temperatur, Windgeschwindigkeit, Preis, Residuallast). 
+* **Besonderheit:** Integrierte Live-Prüfung der Datenqualität (Missing Values Report für die gewählten Spalten).
+
+### 2. Hypothese 1: Der Merit-Order-Effekt (Scatter-Plot)
+**Hypothese:** *Senken Erneuerbare Energien kurzfristig den Strompreis?*
+Das Diagramm plottet die kumulierte Einspeisung aus Wind und Solar gegen den Day-Ahead-Preis, farblich kodiert nach der aktuellen Gesamtlast. 
+* **Erkenntnis:** Visueller Beweis des Preisverfalls (bis in den negativen Bereich) bei hoher Einspeisung von Grenzkosten-Null-Kraftwerken, unabhängig vom aktuellen Verbrauch.
+
+### 3. Hypothese 2: Hitzeextreme und Preisstruktur (Aggregierter Bubble-Chart)
+**Hypothese:** *Führen extreme Temperaturen (>30°C) zu höheren Strompreisen?*
+Um das Rauschen der 8760 Jahresstunden zu minimieren, werden die Daten auf ganze Temperaturgrade aggregiert. Die Blasengröße gibt die statistische Relevanz (Anzahl der Stunden) an.
+* **Erkenntnis:** Visualisierung der "U-Kurve" des Strommarktes, bei der extreme Hitze (Kühllast/Sommerflaute) sowie extreme Kälte (Heizlast) zu Preissprüngen führen.
+
+### 4. Tageslastprofil / SLP (Line-Chart)
+Zeitreihenanalyse des deutschen Stromverbrauchs im Tagesverlauf. 
+* **Besonderheit:** Die UTC-Rohdaten der API werden on-the-fly in die deutsche Lokalzeit (`Europe/Berlin`) konvertiert, um menschliche Verhaltensmuster korrekt abzubilden. Zudem trennt die Analyse strikt zwischen Werktagen (Industrielast) und Wochenenden.

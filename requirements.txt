@@ -8,6 +8,12 @@ openmeteo-requests==1.3.0
 requests-cache==1.2.0
 retry-requests==2.0.0
 
+# Spezielle Bibliotheken für Entsoe ()
+entsoe-py==0.7.11
+
+# Bibilithek für .env Datei
+python-dotenv==1.2.2
+
 # Hilfsmittel für Zeitzonen (Wichtig für Berlin-Zeit)
 pytz==2024.1
 
