@@ -1,0 +1,14 @@
+# ==========================================
+# BIA Power Oracle - Development Requirements
+# ==========================================
+
+# 1. Importiere automatisch alle produktiven Bibliotheken
+# (So müssen wir Abhängigkeiten nicht doppelt pflegen)
+-r requirements.txt
+
+# 2. Testing-Framework
+pytest>=8.0.0
+pytest-cov>=5.0.0
+
+# 3. Linting & Code-Qualität (Wie in der CI-Pipeline definiert)
+flake8>=7.0.0
