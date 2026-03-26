@@ -18,7 +18,7 @@ jobs:
     - name: Repository klonen (Code auf den Server laden)
       uses: actions/checkout@v3
 
-    - name: Python 3.9 Umgebung aufsetzen
+    - name: Python 3.13.7 Umgebung aufsetzen
       uses: actions/setup-python@v4
       with:
         python-version: "3.13.7"
