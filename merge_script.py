@@ -3,8 +3,6 @@ from datetime import datetime
 import os
 import logging
 
-# Importiere die Hauptfunktionen aus deinen bestehenden Dateien
-# (Passe die Dateinamen 'fetch_weather' und 'smard_api' an deine tatsächlichen Dateinamen an)
 from fetch_weather_data import fetch_weather_data
 from fetch_smard_data import fetch_smard_data
 
