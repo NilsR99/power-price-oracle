@@ -2,7 +2,7 @@
 import streamlit as st
 import plotly.express as px
 
-def render_korrelationsmatrix(df_master, df_numeric):
+def render_korrelationsmatrix(df_numeric, filter_container):
     st.header("Korrelations-Matrix")
     
     all_available_columns = df_numeric.columns.tolist()
@@ -10,7 +10,7 @@ def render_korrelationsmatrix(df_master, df_numeric):
     default_selection = ["price_day_ahead", "temperature_2m"]
     valid_defaults = [col for col in default_selection if col in all_available_columns]
     
-    selected_columns = st.sidebar.multiselect(
+    selected_columns = filter_container.multiselect(
         "Metriken auswählen (Mindestens 2)",
         options=all_available_columns,
         default=valid_defaults if valid_defaults else None
@@ -22,9 +22,9 @@ def render_korrelationsmatrix(df_master, df_numeric):
         df_filtered = df_numeric[selected_columns]
         
         missing_data_ratio = df_filtered.isna().sum() / len(df_filtered) * 100
-        st.sidebar.markdown("---")
-        st.sidebar.write("📉 **Datenlücken (NaN) der Auswahl:**")
-        st.sidebar.dataframe(missing_data_ratio.round(2))
+        filter_container.markdown("---")
+        filter_container.write("📉 **Datenlücken (NaN) der Auswahl:**")
+        filter_container.dataframe(missing_data_ratio.round(2))
 
         st.markdown("*Achtung: Ausgeblendete Variablen können zu einer verzerrten Kausalitätswahrnehmung führen.*")
 

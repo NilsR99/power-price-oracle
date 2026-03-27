@@ -15,10 +15,12 @@ requests>=2.31.0
 requests-cache>=1.2.0
 retry-requests>=2.0.0
 
-# Spezifische Datenquellen (Open-Meteo & ENTSO-E)
+# Spezifische Datenquellen (Open-Meteo)
 openmeteo-requests>=1.3.0
-entsoe-py>=0.7.11
 
 # System & Konfiguration
 python-dotenv>=1.2.0
 pytz>=2024.1
+
+# mathematische Funktion für die Trendlinie
+statsmodels
