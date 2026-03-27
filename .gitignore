@@ -37,3 +37,7 @@ desktop.ini
 # Konfigurationseinstellungen von VS Code, PyCharm etc.
 .vscode/
 .idea/
+
+# Testing
+.coverage
+.cache.sqlite
