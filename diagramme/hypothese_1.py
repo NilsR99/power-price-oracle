@@ -20,12 +20,14 @@ def render_hypothese_1(df_master):
         
         fig_scatter = px.scatter(
             df_plot, x="total_wind_solar", y="price_day_ahead", color="actual_total_load",
-            color_continuous_scale="Plasma", opacity=0.5, 
+            color_continuous_scale="Plasma", opacity=0.6, 
             labels={"total_wind_solar": "Wind + PV Einspeisung (MWh)", "price_day_ahead": "Day-Ahead Preis (€/MWh)", "actual_total_load": "Gesamtlast (MWh)"},
-            hover_data=["date"]
+            hover_data=["date"], 
+            trendline="ols", 
+            trendline_color_override="green",
         )
         
-        fig_scatter.update_layout(height=600, plot_bgcolor="rgba(0,0,0,0)")
+        fig_scatter.update_layout(height=600, plot_bgcolor="rgba(0,0,0,0)", yaxis=dict(range=[-100, 300]))
         fig_scatter.add_hline(y=0, line_dash="dash", line_color="red", annotation_text="0 € Grenze")
         st.plotly_chart(fig_scatter, use_container_width=True)
         

@@ -104,6 +104,9 @@ anzahl_stunden = len(df_master)
 st.markdown(f"**🗓️ Analysierter Zeitraum:** `{ui_start_date}` bis `{ui_end_date}` | **📊 Datenpunkte:** `{anzahl_stunden} Stunden`")
 st.markdown("---") # Optische Trennlinie, bevor die eigentlichen Diagramme beginnen
 
+# Wir reservieren diesen Bereich ganz oben in der Sidebar
+sidebar_dynamic_filters = st.sidebar.container()
+
 # --- Navigation (Das "Burger-Menü" in der Sidebar) ---
 st.sidebar.title("Navigation")
 menu_selection = st.sidebar.radio(
@@ -119,7 +122,7 @@ df_numeric = df_master.select_dtypes(include=['number'])
 # --- Routing Logik ---
 # Abhängig von der Menüauswahl rufen wir die entsprechende Funktion aus diagramme.py auf
 if menu_selection == "Korrelations-Matrix":
-    km.render_korrelationsmatrix(df_master, df_numeric)
+    km.render_korrelationsmatrix(df_numeric, sidebar_dynamic_filters)
 
 elif menu_selection == "Hypothese 1 (Merit-Order)":
     h1.render_hypothese_1(df_master)
