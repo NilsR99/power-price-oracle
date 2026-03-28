@@ -12,14 +12,21 @@ logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(
 # --- ZENTRALE KONFIGURATION ---
 # Liste der SMARD-IDs (Filter-ID, Gewünschter_Spaltenname)
 SMARD_CONFIG = [
-    ("4169", "price_day_ahead"),      # Target: Der Börsenpreis
-    ("410",  "actual_total_load"),    # Realisierter Stromverbrauch (Gesamtlast)
-    ("4359", "actual_residual_load"), # Ist-Residuallast
-    ("4067", "actual_wind_onshore"),  # Ist-Erzeugung Wind Onshore
-    ("4068", "actual_pv"),            # Ist-Erzeugung Photovoltaik
-    ("1225", "actual_wind_offshore"), # Ist-Erzeugung Wind Offshore
-    ("4071", "actual_gas"),           # Ist-Erzeugung Erdgas
-    ("1223", "actual_brown_coal")     # Ist-Erzeugung Braunkohle
+    ("4169", "price_day_ahead"),            # Target: Der Börsenpreis
+    ("410",  "actual_total_load"),          # Realisierter Stromverbrauch (Gesamtlast)
+    ("4359", "actual_residual_load"),       # Ist-Residuallast
+    ("4067", "actual_wind_onshore"),        # Ist-Erzeugung Wind Onshore
+    ("4068", "actual_pv"),                  # Ist-Erzeugung Photovoltaik
+    ("1225", "actual_wind_offshore"),       # Ist-Erzeugung Wind Offshore
+    ("4071", "actual_gas"),                 # Ist-Erzeugung Erdgas
+    ("1223", "actual_brown_coal"),          # Ist-Erzeugung Braunkohle
+    ("1224", "actual_nuclear"),             # Ist-Erzeugung Kernenergie
+    ("1226", "actual_hydro"),               # Ist-Erzeugung Wasserkraft
+    ("1227", "actual_other_conventional"),  # Ist-Erzeugung sonstige konventionelle Energieträger
+    ("1228", "actual_other_renewables"),    # Ist-Erzeugung sonstige erneuerbare Energien
+    ("4066", "actual_biomass"),             # Ist-Erzeugung Biomasse
+    ("4069", "actual_hard_coal"),           # Ist-Erzeugung Steinkohle
+    ("4070", "actual_pumped_storage")       # Ist-Erzeugung Pumpspeicher
 ]
 # ------------------------------
 
@@ -28,7 +35,7 @@ def validate_date_range(start_date: str, end_date: str) -> bool:
     TESTBARE LOGIK: Prüft, ob die Eingabedaten im erlaubten Bereich (2020-2025) liegen
     und chronologisch Sinn machen.
     """
-    min_date = pd.to_datetime("2020-01-01")
+    min_date = pd.to_datetime("2010-01-01")
     max_date = pd.to_datetime("2025-12-31")
 
     try:
@@ -41,7 +48,7 @@ def validate_date_range(start_date: str, end_date: str) -> bool:
         raise ValueError("Logischer Fehler: Das Startdatum darf nicht nach dem Enddatum liegen.")
 
     if start_dt < min_date or end_dt > max_date:
-        raise ValueError("Die gewählten Daten liegen außerhalb des erlaubten Bereichs (01.01.2020 bis 31.12.2025).")
+        raise ValueError("Die gewählten Daten liegen außerhalb des erlaubten Bereichs (01.01.2010 bis 31.12.2025).")
 
     return True
 

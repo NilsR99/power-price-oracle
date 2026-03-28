@@ -8,7 +8,7 @@ def render_hypothese_2(df_master):
     missing_cols = [col for col in required_cols if col not in df_master.columns]
     
     if missing_cols:
-        st.warning(f"⚠️ Für diesen Beweis fehlen folgende Spalten im Datensatz: {missing_cols}")
+        st.warning(f"Für diesen Beweis fehlen folgende Spalten im Datensatz: {missing_cols}")
     else:
         df_clean = df_master.dropna(subset=required_cols).copy()
         df_clean["temp_rounded"] = df_clean["temperature_2m"].round()
