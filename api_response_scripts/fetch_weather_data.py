@@ -17,7 +17,7 @@ def fetch_weather_data(start_date, end_date):
 
     # Make sure all required weather variables are listed here
     # The order of variables in hourly or daily is important to assign them correctly below
-    url = "https://historical-forecast-api.open-meteo.com/v1/forecast"
+    url = "https://archive-api.open-meteo.com/v1/archive"
     params = {
         "latitude": 52.52,
         "longitude": 13.41,

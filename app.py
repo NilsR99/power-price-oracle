@@ -11,6 +11,8 @@ import diagramme.korrelationsmatrix as km
 import diagramme.hypothese_1 as h1
 import diagramme.hypothese_2 as h2
 import diagramme.standardlastprofil as slp
+import diagramme.kreisdiagramm_Energiemix as kdem
+import diagramme.heatmap_negative_preise as hnp
 
 # --- Streamlit Seitenkonfiguration ---
 st.set_page_config(page_title="BIA Power Oracle", layout="wide")
@@ -111,7 +113,7 @@ sidebar_dynamic_filters = st.sidebar.container()
 st.sidebar.title("Navigation")
 menu_selection = st.sidebar.radio(
     "Wähle eine Analyse:",
-    ("Korrelations-Matrix", "Hypothese 1 (Merit-Order)", "Hypothese 2 (Hitze)", "Tageslastprofil (SLP)")
+    ("Energiemix", "Heatmap: Negative Preise", "Korrelations-Matrix", "Hypothese 1 (Merit-Order)", "Hypothese 2 (Hitze)", "Tageslastprofil (SLP)")
 )
 
 st.sidebar.markdown("---") # Optischer Trenner in der Sidebar
@@ -121,7 +123,13 @@ df_numeric = df_master.select_dtypes(include=['number'])
 
 # --- Routing Logik ---
 # Abhängig von der Menüauswahl rufen wir die entsprechende Funktion aus diagramme.py auf
-if menu_selection == "Korrelations-Matrix":
+if menu_selection == "Energiemix":
+    kdem.render_energiemix_pie(df_master, sidebar_dynamic_filters)
+
+elif menu_selection == "Heatmap: Negative Preise":
+    hnp.render_heatmap(df_master)
+
+elif menu_selection == "Korrelations-Matrix":
     km.render_korrelationsmatrix(df_numeric, sidebar_dynamic_filters)
 
 elif menu_selection == "Hypothese 1 (Merit-Order)":
@@ -131,4 +139,4 @@ elif menu_selection == "Hypothese 2 (Hitze)":
     h2.render_hypothese_2(df_master)
 
 elif menu_selection == "Tageslastprofil (SLP)":
-    slp.render_lastprofil(df_master)
+    slp.render_lastprofil(df_master, sidebar_dynamic_filters)

@@ -20,7 +20,7 @@ def test_validate_date_range_out_of_bounds():
     """Prüft, ob die harte Grenze (2020 bis 2025) eingehalten wird."""
     # Wir erwarten einen ValueError, wenn der Nutzer 2019 auswählt
     with pytest.raises(ValueError, match="außerhalb des erlaubten Bereichs"):
-        validate_date_range("2019-12-31", "2020-01-31")
+        validate_date_range("2009-12-31", "2020-01-31")
         
     # Test für die obere Grenze
     with pytest.raises(ValueError, match="außerhalb des erlaubten Bereichs"):

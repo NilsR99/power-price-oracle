@@ -17,13 +17,13 @@ def render_korrelationsmatrix(df_numeric, filter_container):
     )
 
     if len(selected_columns) < 2:
-        st.error("⚠️ Analytischer Fehler: Du musst mindestens 2 Variablen auswählen, um eine Korrelation zu berechnen.")
+        st.error("Analytischer Fehler: Du musst mindestens 2 Variablen auswählen, um eine Korrelation zu berechnen.")
     else:
         df_filtered = df_numeric[selected_columns]
         
         missing_data_ratio = df_filtered.isna().sum() / len(df_filtered) * 100
         filter_container.markdown("---")
-        filter_container.write("📉 **Datenlücken (NaN) der Auswahl:**")
+        filter_container.write("**Datenlücken (NaN) der Auswahl:**")
         filter_container.dataframe(missing_data_ratio.round(2))
 
         st.markdown("*Achtung: Ausgeblendete Variablen können zu einer verzerrten Kausalitätswahrnehmung führen.*")

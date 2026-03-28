@@ -8,7 +8,7 @@ def render_hypothese_1(df_master):
     missing_cols = [col for col in required_cols if col not in df_master.columns]
     
     if missing_cols:
-        st.error(f"⚠️ Für diesen Beweis fehlen folgende Spalten im Datensatz: {missing_cols}")
+        st.error(f"Für diesen Beweis fehlen folgende Spalten im Datensatz: {missing_cols}")
     else:
         df_master["total_wind_solar"] = (
             df_master["actual_wind_onshore"].fillna(0) + 
